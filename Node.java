@@ -1,4 +1,6 @@
-public class Node implements Comparable<Node>{
+import java.io.Serializable;
+
+public class Node implements Comparable<Node>, Serializable {
     private char character;
     private int frequency;
     private Node left, right;

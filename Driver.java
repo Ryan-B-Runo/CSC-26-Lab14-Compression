@@ -1,14 +1,17 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class Driver {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println(huffmanEncode("Hello World"));
+
+        System.out.println(huffmanDecode(huffmanEncode("Hello World")));
     }
 
-    static String huffmanEncode(String input) {
+    static String huffmanEncode(String input) throws IOException {
         HashMap<Character, Integer> frequency = new HashMap<>();
         Node root;
 
@@ -49,6 +52,12 @@ public class Driver {
             System.out.println("Symbol: " + c + "\tFrequency: " + frequency.get(c) + "\tCode: " + codes.get(c));
         }
 
+        FileOutputStream f = new FileOutputStream("root.node");
+        ObjectOutputStream out = new ObjectOutputStream(f);
+        out.writeObject(root);
+        out.close();
+        f.close();
+
         return "\n" + encoded.toString();
     }
 
@@ -63,8 +72,34 @@ public class Driver {
         preorder(root.getRight(), map, s + '1');
     }
 
-//    static String huffmanDecode(String input, Node root) {
-//
-//    }
+    static String huffmanDecode(String input) {
+
+        StringBuilder decoded = new StringBuilder();
+
+        try{
+            FileInputStream f = new FileInputStream("root.node");
+            ObjectInputStream in = new ObjectInputStream(f);
+            Node root = (Node) in.readObject();
+            Node current = root;
+            in.close();
+            f.close();
+
+            for(char c : input.toCharArray()) {
+                if(c == '0') {
+                    current = current.getLeft();
+                }else{
+                    current = current.getRight();
+                }
+                if(current.getLeft() == null && current.getRight() == null) {
+                    decoded.append(current.getCharacter());
+                    current = root;
+                }
+            }
+
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return decoded.toString();
+    }
 
 }
